@@ -62,3 +62,4 @@ crashlytics-build.properties
 # Ignore "Temp" folder and its meta data
 /[Aa]ssets/[Tt]emp*
 
+.vsconfig
