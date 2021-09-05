@@ -60,5 +60,5 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Ignore "Temp" folder and its meta data
-!/[Aa]ssets/[Tt]emp*
+/[Aa]ssets/[Tt]emp*
 
