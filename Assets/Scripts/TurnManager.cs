@@ -6,13 +6,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour {
-  [Header("Prefabs")]
-  public PlayerCharacter playerPrefab;
-  public List<EnemyCharacter> enemyPrefabs = new List<EnemyCharacter>();
-
-  [Header("Game settings")]
-  public int EnemyCount = 2;
-
   [Header("Player UI controls")]
   public Button EndTurnButton;
   public TMP_Text ButtonText;
@@ -20,26 +13,16 @@ public class TurnManager : MonoBehaviour {
   [HideInInspector]
   public PlayerCharacter player;
   [HideInInspector]
-  public List<EnemyCharacter> enemies = new List<EnemyCharacter>();
+  public List<EnemyCharacter> enemyList = new List<EnemyCharacter>();
 
   private int currentTurnIndex = 0;
   private List<Turn> turns = new List<Turn>();
 
-
   private void Start() {
-    player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+    player = GridManager.Instance.Player;
+    enemyList = GridManager.Instance.EnemyList;
 
     EndTurnButton.onClick.AddListener(() => player.EndTurn());
-
-    enemies.Clear();
-
-    for (int i = 0; i < EnemyCount; i++) {
-      int index = Random.Range(0, enemyPrefabs.Count);
-      // TODO: test if space is already occupied
-      Vector3 position = new Vector3(Mathf.Round(Random.Range(-3f, 3f)), Mathf.Round(Random.Range(-3f, 3f)), 0f);
-
-      enemies.Add(Instantiate(enemyPrefabs[index], position, Quaternion.identity));
-    }
 
     SetupTurns();
   }
@@ -47,7 +30,7 @@ public class TurnManager : MonoBehaviour {
   private void SetupTurns() {
     turns.Add(GetComponentInChildren<ShowFurniturePreviewTurn>());
 
-    turns.AddRange(enemies.Select(enemy => enemy.Turn));
+    turns.AddRange(enemyList.Select(enemy => enemy.Turn));
 
     turns.Add(player.Turn);
   }
