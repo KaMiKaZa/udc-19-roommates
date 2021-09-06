@@ -21,9 +21,11 @@ public class EnemyTurn : CharacterTurn {
 
         Phase = TurnPhase.Running;
 
-        // TODO: remove diagonal moves
         // TODO: try to move away from next furniture's position
-        MoveDirection = new Vector2(Mathf.Round(Random.Range(-1f, 1f)), Mathf.Round(Random.Range(-1f, 1f)));
+        Vector2 verticalOrHorizontal = (Random.Range(0f, 1f) > 0.5f) ? Vector2.up : Vector2.right;
+        float positiveOrNegative = (Random.Range(0f, 1f) > 0.5f) ? 1f : -1f;
+
+        MoveDirection = verticalOrHorizontal * positiveOrNegative;
 
         targetPosition = transform.position + (Vector3)MoveDirection;
 
