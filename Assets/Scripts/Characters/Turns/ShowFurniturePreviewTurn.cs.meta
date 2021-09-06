@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 700b949c7ce9b9f49a2f7b0d9959a376
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - furniturePreview: {fileID: 9024772008407704681, guid: ba87056e6adf3754abefae0cfa408686, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
