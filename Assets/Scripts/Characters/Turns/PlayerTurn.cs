@@ -1,10 +1,8 @@
 using UnityEngine;
 
-public class PlayerTurn : Turn {
-  private PlayerCharacter player;
-
+public class PlayerTurn : CharacterTurn {
   private void Awake() {
-    player = GetComponentInParent<PlayerCharacter>();
+    character = GetComponentInParent<PlayerCharacter>();
   }
 
   public override TurnPhase Execute(TurnManager manager) {
