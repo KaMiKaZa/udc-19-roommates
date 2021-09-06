@@ -10,7 +10,7 @@ public class Turn : MonoBehaviour {
 
   public TurnPhase Phase { get; set; }
 
-  public void Reset() {
+  public virtual void Reset() {
     Phase = TurnPhase.Start;
   }
 
