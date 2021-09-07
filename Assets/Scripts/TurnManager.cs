@@ -38,7 +38,7 @@ public class TurnManager : MonoBehaviour {
   private void Update() {
     Turn currentTurn = turns[currentTurnIndex];
 
-    if (currentTurn.Execute(this) == Turn.TurnPhase.End) {
+    if (currentTurn.Execute(this) == TurnPhase.End) {
       currentTurn.Reset();
 
       currentTurnIndex = (currentTurnIndex + 1) % turns.Count;

@@ -11,7 +11,9 @@ public class PlayerCharacter : Character {
   }
 
   private void Update() {
-    if (Turn.Phase != Turn.TurnPhase.Running) {
+    // TODO: player can select movement direction before the actual turn
+
+    if (Turn.Phase != TurnPhase.Start) {
       return;
     }
 
