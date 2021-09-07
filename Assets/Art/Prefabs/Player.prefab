@@ -40,7 +40,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 750366422854657839}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7036e678bafc414ea27f4fda730ebe8, type: 3}
+  m_Script: {fileID: 11500000, guid: a3a7171d4d383f4449bce3e12f95af2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1018660220662690243
@@ -157,24 +157,8 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6292857856118017952}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 028e891b-2b37-4f6e-b7c6-21a1daa8da28
-    m_ActionName: Game/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6292857856118017952}
         m_TargetAssemblyTypeName: PlayerActor, Assembly-CSharp
-        m_MethodName: OnTurnEnd
+        m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -184,6 +168,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+    m_ActionId: 028e891b-2b37-4f6e-b7c6-21a1daa8da28
+    m_ActionName: Game/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls: []
     m_ActionId: 727064b9-8b68-465d-ae3c-44c10553008b
     m_ActionName: Game/TurnEnd[/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0

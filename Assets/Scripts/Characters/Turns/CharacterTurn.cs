@@ -1,13 +1,51 @@
 using UnityEngine;
 
 public class CharacterTurn : Turn {
-  protected Character character;
+  private Character character;
 
+  private float positionBlend;
+
+  public Vector3 TargetPosition { get; set; }
   public Vector2 MoveDirection { get; set; }
+
+  private void Awake() {
+    character = GetComponentInParent<Character>();
+  }
 
   public override void Reset() {
     base.Reset();
 
     MoveDirection = Vector2.zero;
+
+    positionBlend = 0f;
+  }
+
+  public override TurnPhase Execute(TurnManager manager) {
+    switch (Phase) {
+      case TurnPhase.Start: {
+        Vector2? move = character.GetMove();
+
+        if (move.HasValue) {
+          TargetPosition = character.transform.position + (Vector3)move.Value;
+
+          Phase = TurnPhase.Running;
+        }
+
+        break;
+      }
+      case TurnPhase.Running: {
+        if (transform.position == TargetPosition) {
+          Phase = TurnPhase.End;
+        } else {
+          character.transform.position = Vector3.Lerp(transform.position, TargetPosition, positionBlend);
+
+          positionBlend += Time.deltaTime;
+        }
+
+        break;
+      }
+    }
+
+    return Phase;
   }
 }
