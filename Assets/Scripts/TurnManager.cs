@@ -6,23 +6,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour {
-  [Header("Player UI controls")]
-  public Button EndTurnButton;
-  public TMP_Text ButtonText;
+  // characters
+  private PlayerCharacter player;
+  private List<EnemyCharacter> enemyList = new List<EnemyCharacter>();
 
-  [HideInInspector]
-  public PlayerCharacter player;
-  [HideInInspector]
-  public List<EnemyCharacter> enemyList = new List<EnemyCharacter>();
-
+  // turns
   private int currentTurnIndex = 0;
   private List<Turn> turns = new List<Turn>();
 
   private void Start() {
     player = GridManager.Instance.Player;
     enemyList = GridManager.Instance.EnemyList;
-
-    EndTurnButton.onClick.AddListener(() => player.EndTurn());
 
     SetupTurns();
   }
@@ -45,11 +39,5 @@ public class TurnManager : MonoBehaviour {
 
       currentTurnIndex = (currentTurnIndex + 1) % turns.Count;
     }
-  }
-
-  public void UpdateButton(string text, bool isEnabled = false) {
-    ButtonText.text = text;
-
-    EndTurnButton.interactable = isEnabled;
   }
 }

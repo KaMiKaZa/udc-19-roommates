@@ -7,7 +7,7 @@ public class ShowFurniturePreviewTurn : Turn {
 
   public override TurnPhase Execute(TurnManager manager) {
     if (Phase == TurnPhase.Start) {
-      manager.UpdateButton("Next Furniture Incoming");
+      UIManager.Instance.TurnInfoText.text = "Furniture Incoming";
 
       Phase = TurnPhase.Running;
 
