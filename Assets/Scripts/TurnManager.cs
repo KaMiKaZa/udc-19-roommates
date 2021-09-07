@@ -33,6 +33,8 @@ public class TurnManager : MonoBehaviour {
     turns.AddRange(enemyList.Select(enemy => enemy.Turn));
 
     turns.Add(player.Turn);
+
+    turns.Add(GetComponentInChildren<SpawnFurnitureTurn>());
   }
 
   private void Update() {
