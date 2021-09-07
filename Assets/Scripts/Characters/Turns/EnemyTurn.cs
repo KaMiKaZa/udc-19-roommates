@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyTurn : CharacterTurn {
@@ -21,14 +22,25 @@ public class EnemyTurn : CharacterTurn {
 
         Phase = TurnPhase.Running;
 
-        // TODO: try to move away from next furniture's position
-        Vector2 verticalOrHorizontal = (Random.Range(0f, 1f) > 0.5f) ? Vector2.up : Vector2.right;
-        float positiveOrNegative = (Random.Range(0f, 1f) > 0.5f) ? 1f : -1f;
+        List<Vector2> attemps = new List<Vector2>() {
+          Vector2.up, Vector2.down, Vector2.right, Vector2.left,
+        };
 
-        MoveDirection = verticalOrHorizontal * positiveOrNegative;
+        do {
+          // TODO: try to move away from next furniture's position
+
+          MoveDirection = attemps[Random.Range(0, attemps.Count)];
+
+          attemps.Remove(MoveDirection);
+        } while (attemps.Count > 0 && !GridManager.Instance.CanMove(transform.position, MoveDirection));
+
+        // skip the turn if enemy have no way to go
+        if (!GridManager.Instance.CanMove(transform.position, MoveDirection)) {
+          MoveDirection = Vector2.zero;
+        }
 
         targetPosition = transform.position + (Vector3)MoveDirection;
-
+        
         break;
       }
       case TurnPhase.Running: {
