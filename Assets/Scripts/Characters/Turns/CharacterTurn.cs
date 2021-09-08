@@ -34,12 +34,15 @@ public class CharacterTurn : Turn {
         break;
       }
       case TurnPhase.Running: {
-        if (transform.position == TargetPosition) {
-          Phase = TurnPhase.End;
-        } else {
+        if (positionBlend < 1f) {
           character.transform.position = Vector3.Lerp(transform.position, TargetPosition, positionBlend);
 
           positionBlend += Time.deltaTime;
+        } else {
+          // to avoid any kind of precision error
+          transform.position = TargetPosition;
+
+          Phase = TurnPhase.End;
         }
 
         break;
