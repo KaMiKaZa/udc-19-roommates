@@ -68,11 +68,16 @@ public class GridManager : MonoBehaviour {
   public bool IsOccupied(Vector2 position) {
     Vector3 worldPosition = new Vector3(position.x, position.y, 0f);
 
+    // TODO: check for walls and windows
     if (Mathf.Abs(position.x) > selectedGrid.GridWidth / 2 || Mathf.Abs(position.y) > selectedGrid.GridHeight / 2) {
       return true;
     }
 
     if (characterList.Any(character => character.transform.position == worldPosition)) {
+      return true;
+    }
+
+    if (spawnedFurnitureList.Any(entry => entry.CompositeCollider.OverlapPoint(position))) {
       return true;
     }
 
@@ -104,6 +109,8 @@ public class GridManager : MonoBehaviour {
 
     // increase size to visualize spawn effect
     currentFurniture.transform.localScale = Vector3.one * 7.5f;
+
+    spawnedFurnitureList.Add(currentFurniture);
 
     return currentFurniture;
   }
