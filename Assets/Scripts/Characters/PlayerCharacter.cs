@@ -6,16 +6,16 @@ public class PlayerCharacter : Character {
 
   private Vector2? chosenMove = null;
 
-  private void Awake() {
-    playerActor = GetComponent<PlayerActor>();
+  protected override void Awake() {
+    base.Awake();
 
-    Turn = GetComponentInChildren<CharacterTurn>();
+    playerActor = GetComponent<PlayerActor>();
   }
 
   private void Update() {
     // TODO: player can select movement direction before the actual turn
 
-    if (Turn.Phase != TurnPhase.Start) {
+    if (!IsMyTurn) {
       chosenMove = null;
 
       return;

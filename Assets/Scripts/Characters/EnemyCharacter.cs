@@ -2,10 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyCharacter : Character {
-  private void Awake() {
-    Turn = GetComponentInChildren<CharacterTurn>();
-  }
-
   public override Vector2? GetMove() {
     UIManager.Instance.TurnInfoText.text = "Enemy's turn";
 
