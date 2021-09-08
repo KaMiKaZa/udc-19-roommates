@@ -21,16 +21,16 @@ public class GridManager : MonoBehaviour {
   // grid
   private FurnitureGrid selectedGrid;
   private Queue<GridEntry> furnitureQueue = new Queue<GridEntry>();
+  private List<GridEntry> spawnedFurnitureList = new List<GridEntry>();
 
   private GridEntry currentFurniture;
   public GridEntry CurrentFurniture => currentFurniture;
 
   // characters
   private PlayerCharacter player;
-  private List<EnemyCharacter> enemyList = new List<EnemyCharacter>();
+  private List<Character> characterList = new List<Character>();
 
-  public PlayerCharacter Player => player;
-  public List<EnemyCharacter> EnemyList => enemyList;
+  public List<Character> CharacterList => characterList;
 
   private void Awake() {
     if (Instance == null) {
@@ -48,8 +48,6 @@ public class GridManager : MonoBehaviour {
       furnitureQueue.Enqueue(entry);
     }
 
-    player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-
     for (int i = 0; i < selectedGrid.EnemyCount; i++) {
       int index = Random.Range(0, enemyPrefabs.Length);
 
@@ -59,8 +57,11 @@ public class GridManager : MonoBehaviour {
         spawnPosition = new Vector2(Mathf.Round(Random.Range(-3f, 3f)), Mathf.Round(Random.Range(-3f, 3f)));
       } while (IsOccupied(spawnPosition));
 
-      enemyList.Add(Instantiate(enemyPrefabs[index], spawnPosition, Quaternion.identity));
+      characterList.Add(Instantiate(enemyPrefabs[index], spawnPosition, Quaternion.identity));
     }
+
+    player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+    characterList.Add(player);
   }
 
   // TODO: return enum instead of bool
@@ -71,7 +72,7 @@ public class GridManager : MonoBehaviour {
       return true;
     }
 
-    if (player.transform.position == worldPosition || enemyList.Any(enemy => enemy.transform.position == worldPosition)) {
+    if (characterList.Any(character => character.transform.position == worldPosition)) {
       return true;
     }
 

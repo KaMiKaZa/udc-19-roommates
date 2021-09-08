@@ -6,29 +6,19 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour {
-  // characters
-  private PlayerCharacter player;
-  private List<EnemyCharacter> enemyList = new List<EnemyCharacter>();
-
-  // turns
   private int currentTurnIndex = 0;
   private List<Turn> turns = new List<Turn>();
 
   private void Start() {
-    player = GridManager.Instance.Player;
-    enemyList = GridManager.Instance.EnemyList;
-
     SetupTurns();
   }
 
   private void SetupTurns() {
     turns.Add(GetComponentInChildren<ShowFurniturePreviewTurn>());
 
-    foreach (var enemyTurns in enemyList.Select(enemy => enemy.Turns)) {
-      turns.AddRange(enemyTurns);
+    foreach (var characterTurns in GridManager.Instance.CharacterList.Select(enemy => enemy.Turns)) {
+      turns.AddRange(characterTurns);
     }
-
-    turns.AddRange(player.Turns);
 
     turns.Add(GetComponentInChildren<SpawnFurnitureTurn>());
   }
