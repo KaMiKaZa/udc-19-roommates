@@ -24,15 +24,21 @@ public class TurnManager : MonoBehaviour {
   private void SetupTurns() {
     turns.Add(GetComponentInChildren<ShowFurniturePreviewTurn>());
 
-    turns.AddRange(enemyList.Select(enemy => enemy.Turn));
+    foreach (var enemyTurns in enemyList.Select(enemy => enemy.Turns)) {
+      turns.AddRange(enemyTurns);
+    }
 
-    turns.Add(player.Turn);
+    turns.AddRange(player.Turns);
 
     turns.Add(GetComponentInChildren<SpawnFurnitureTurn>());
   }
 
   private void Update() {
     Turn currentTurn = turns[currentTurnIndex];
+
+    if (currentTurn.Phase == TurnPhase.Wait) {
+      currentTurn.Phase = TurnPhase.Start;
+    }
 
     if (currentTurn.Execute(this) == TurnPhase.End) {
       currentTurn.Reset();

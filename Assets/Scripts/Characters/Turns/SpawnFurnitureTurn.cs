@@ -8,10 +8,6 @@ public class SpawnFurnitureTurn : Turn {
 
   private float scaleBlend;
 
-  private void Awake() {
-    Phase = TurnPhase.Start;
-  }
-
   public override TurnPhase Execute(TurnManager manager) {
     switch (Phase) {
       case TurnPhase.Start: {

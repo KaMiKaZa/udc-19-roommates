@@ -1,10 +1,6 @@
 using UnityEngine;
 
 public class ShowFurniturePreviewTurn : Turn {
-  private void Awake() {
-    Phase = TurnPhase.Start;
-  }
-
   public override TurnPhase Execute(TurnManager manager) {
     if (Phase == TurnPhase.Start) {
       UIManager.Instance.TurnInfoText.text = "Furniture Incoming";

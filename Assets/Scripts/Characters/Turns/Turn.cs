@@ -5,7 +5,7 @@ public class Turn : MonoBehaviour {
   public TurnPhase Phase { get; set; }
 
   public virtual void Reset() {
-    Phase = TurnPhase.Start;
+    Phase = TurnPhase.Wait;
   }
 
   public virtual TurnPhase Execute(TurnManager manager) {
