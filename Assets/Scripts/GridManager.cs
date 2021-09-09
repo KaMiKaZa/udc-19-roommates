@@ -38,11 +38,8 @@ public class GridManager : MonoBehaviour {
     }
 
     selectedGrid = Instantiate(FurnitureGridPrefabs[Random.Range(0, FurnitureGridPrefabs.Length)], transform);
-    var orderedGridEntries = selectedGrid.Grid
-      .GetComponentsInChildren<GridEntry>()
-      .OrderByDescending(entry => entry.transform.childCount);
 
-    foreach (var entry in orderedGridEntries) {
+    foreach (var entry in selectedGrid.GetComponentsInChildren<GridEntry>()) {
       entry.gameObject.SetActive(false);
 
       furnitureQueue.Enqueue(entry);
