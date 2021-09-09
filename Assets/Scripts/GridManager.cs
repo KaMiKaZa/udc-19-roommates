@@ -29,7 +29,6 @@ public class GridManager : MonoBehaviour {
   // characters
   private PlayerCharacter player;
   private List<Character> characterList = new List<Character>();
-
   public List<Character> CharacterList => characterList;
 
   private void Awake() {
@@ -61,6 +60,22 @@ public class GridManager : MonoBehaviour {
     characterList.Add(player);
   }
 
+  public void ActivatePreview() {
+    if (furnitureQueue.Count > 0) {
+      currentFurniture = furnitureQueue.Dequeue();
+
+      currentFurniture.ActivatePreview();
+    }
+  }
+
+  public GridEntry ActivateSpawn() {
+    currentFurniture.ActivateSpawn();
+
+    spawnedFurnitureList.Add(currentFurniture);
+
+    return currentFurniture;
+  }
+
   // TODO: return enum instead of bool
   public bool IsOccupied(Vector2 position) {
     Vector3 worldPosition = new Vector3(position.x, position.y, 0f);
@@ -83,32 +98,5 @@ public class GridManager : MonoBehaviour {
 
   public bool CanMove(Vector2 positionFrom, Vector2 moveDirection) {
     return !IsOccupied(positionFrom + moveDirection);
-  }
-
-  public void EnableFurniturePreview() {
-    if (furnitureQueue.Count > 0) {
-      currentFurniture = furnitureQueue.Dequeue();
-
-      currentFurniture.gameObject.SetActive(true);
-    }
-  }
-
-  public GridEntry SpawnCurrentFurniture() {
-    // return alpha back to 1f
-    // it was 0.5f for a preview
-    var renderers = currentFurniture.GetComponentsInChildren<SpriteRenderer>();
-
-    foreach (var renderer in renderers) {
-      var color = renderer.color;
-      color.a = 1f;
-      renderer.color = color;
-    }
-
-    // increase size to visualize spawn effect
-    currentFurniture.transform.localScale = Vector3.one * 7.5f;
-
-    spawnedFurnitureList.Add(currentFurniture);
-
-    return currentFurniture;
   }
 }

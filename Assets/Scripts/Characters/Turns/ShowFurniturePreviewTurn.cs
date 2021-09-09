@@ -11,7 +11,7 @@ public class ShowFurniturePreviewTurn : Turn {
         // TODO: do a proper retrieval from a pre-created furniture grid
         Vector3 position = new Vector3(Mathf.Round(Random.Range(-3f, 3f)), Mathf.Round(Random.Range(-3f, 3f)), 0f);
 
-        GridManager.Instance.EnableFurniturePreview();
+        GridManager.Instance.ActivatePreview();
 
         Phase = TurnPhase.End;
       }, 0.5f);

@@ -13,7 +13,7 @@ public class SpawnFurnitureTurn : Turn {
       case TurnPhase.Start: {
         UIManager.Instance.TurnInfoText.text = "Furniture Is Here";
 
-        gridEntry = GridManager.Instance.SpawnCurrentFurniture();
+        gridEntry = GridManager.Instance.ActivateSpawn();
 
         scaleBlend = 0f;
 
