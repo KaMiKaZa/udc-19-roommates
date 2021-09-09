@@ -16,10 +16,10 @@ public class EnemyCharacter : Character {
       selection = attemps[Random.Range(0, attemps.Count)];
 
       attemps.Remove(selection);
-    } while (attemps.Count > 0 && !GridManager.Instance.CanMove(transform.position, selection));
+    } while (attemps.Count > 0 && !GridManager.Instance.IsInputValid(transform.position, selection));
 
     // skip the turn if enemy have no way to go
-    if (!GridManager.Instance.CanMove(transform.position, selection)) {
+    if (!GridManager.Instance.IsInputValid(transform.position, selection)) {
       selection = Vector2.zero;
     }
 

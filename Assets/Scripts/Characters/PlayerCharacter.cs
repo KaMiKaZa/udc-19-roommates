@@ -22,7 +22,7 @@ public class PlayerCharacter : Character {
     }
 
     if (playerActor.move != Vector2.zero && playerActor.move.magnitude <= 1f) {
-      if (GridManager.Instance.CanMove(transform.position, playerActor.move)) {
+      if (GridManager.Instance.IsInputValid(transform.position, playerActor.move)) {
         chosenMove = playerActor.move;
       }
     }

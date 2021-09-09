@@ -96,7 +96,7 @@ public class GridManager : MonoBehaviour {
     return false;
   }
 
-  public bool CanMove(Vector2 positionFrom, Vector2 moveDirection) {
-    return !IsOccupied(positionFrom + moveDirection);
+  public bool IsInputValid(Vector2 positionFrom, Vector2 inputDirection) {
+    return !IsOccupied(positionFrom + inputDirection);
   }
 }
