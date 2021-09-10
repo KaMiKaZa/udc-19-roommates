@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour {
   public enum OccupyKind {
+    None,
     Character,
+    Furniture,
     Wall,
+    Window,
   }
 
   public static GridManager Instance { get; private set; }
@@ -51,7 +54,7 @@ public class GridManager : MonoBehaviour {
 
       do {
         spawnPosition = new Vector2(Mathf.Round(Random.Range(-3f, 3f)), Mathf.Round(Random.Range(-3f, 3f)));
-      } while (IsOccupied(spawnPosition));
+      } while (IsOccupied(spawnPosition) != OccupyKind.None);
 
       characterList.Add(Instantiate(enemyPrefabs[index], spawnPosition, Quaternion.identity));
     }
@@ -76,27 +79,28 @@ public class GridManager : MonoBehaviour {
     return currentFurniture;
   }
 
-  // TODO: return enum instead of bool
-  public bool IsOccupied(Vector2 position) {
+  public OccupyKind IsOccupied(Vector2 position) {
     Vector3 worldPosition = new Vector3(position.x, position.y, 0f);
 
     // TODO: check for walls and windows
     if (Mathf.Abs(position.x) > selectedGrid.GridWidth / 2 || Mathf.Abs(position.y) > selectedGrid.GridHeight / 2) {
-      return true;
-    }
-
-    if (characterList.Any(character => character.transform.position == worldPosition)) {
-      return true;
+      return OccupyKind.Wall;
     }
 
     if (spawnedFurnitureList.Any(entry => entry.CompositeCollider.OverlapPoint(position))) {
-      return true;
+      return OccupyKind.Furniture;
     }
 
-    return false;
+    if (characterList.Any(character => character.transform.position == worldPosition)) {
+      return OccupyKind.Character;
+    }
+
+    return OccupyKind.None;
   }
 
   public bool IsInputValid(Vector2 positionFrom, Vector2 inputDirection) {
-    return !IsOccupied(positionFrom + inputDirection);
+    var occupyKind = IsOccupied(positionFrom + inputDirection);
+
+    return occupyKind == OccupyKind.None;
   }
 }
