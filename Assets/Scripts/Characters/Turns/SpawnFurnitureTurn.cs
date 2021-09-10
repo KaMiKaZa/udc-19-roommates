@@ -1,9 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class SpawnFurnitureTurn : Turn {
-  [Tooltip("Time to spawn furniture in seconds")]
-  public float spawnTime = 2f;
-
   private GridEntry gridEntry;
 
   private float scaleBlend;
@@ -22,12 +20,14 @@ public class SpawnFurnitureTurn : Turn {
         break;
       }
       case TurnPhase.Running: {
-        if (gridEntry.transform.localScale != Vector3.one) {
-          scaleBlend += Time.deltaTime;
+        if (scaleBlend < 1f) {
+          gridEntry.transform.localScale = Vector3.Lerp(gridEntry.transform.localScale, Vector3.one, scaleBlend);
 
-          gridEntry.transform.localScale = Vector3.Lerp(gridEntry.transform.localScale, Vector3.one, scaleBlend / spawnTime);
+          scaleBlend += Time.deltaTime;
         } else {
-          // TODO: kill all affected characters
+          GridManager.Instance.CheckForDeadCharacters();
+
+          gridEntry.transform.localScale = Vector3.one;
 
           Phase = TurnPhase.End;
         }

@@ -5,6 +5,8 @@ public class CharacterTurn : Turn {
 
   private float positionBlend;
 
+  public override bool CanExecute => character.IsAlive;
+
   public Vector3 TargetPosition { get; set; }
   public Vector2 MoveDirection { get; set; }
 

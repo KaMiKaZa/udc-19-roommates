@@ -3,13 +3,15 @@ using System.Linq;
 using UnityEngine;
 
 public class Character : MonoBehaviour {
-  public bool IsAlive { get; }
+  public bool IsAlive { get; set; }
 
   public CharacterTurn[] Turns { get; protected set; }
   
   public bool IsMyTurn => Turns.Any(turn => turn.Phase != TurnPhase.Wait);
 
   protected virtual void Awake() {
+    IsAlive = true;
+
     Turns = GetComponentsInChildren<CharacterTurn>();
   }
 

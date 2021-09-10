@@ -103,4 +103,14 @@ public class GridManager : MonoBehaviour {
 
     return occupyKind == OccupyKind.None;
   }
+
+  public void CheckForDeadCharacters() {
+    // TODO: stop the game if player is dead
+
+    var deadCharacters = CharacterList.Where(character => IsOccupied(character.transform.position) == OccupyKind.Furniture);
+
+    foreach (var character in deadCharacters) {
+      character.IsAlive = false;
+    }
+  }
 }

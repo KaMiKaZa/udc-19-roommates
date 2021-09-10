@@ -26,13 +26,17 @@ public class TurnManager : MonoBehaviour {
   private void Update() {
     Turn currentTurn = turns[currentTurnIndex];
 
-    if (currentTurn.Phase == TurnPhase.Wait) {
-      currentTurn.Phase = TurnPhase.Start;
-    }
+    if (currentTurn.CanExecute) {
+      if (currentTurn.Phase == TurnPhase.Wait) {
+        currentTurn.Phase = TurnPhase.Start;
+      }
 
-    if (currentTurn.Execute(this) == TurnPhase.End) {
-      currentTurn.Reset();
+      if (currentTurn.Execute(this) == TurnPhase.End) {
+        currentTurn.Reset();
 
+        currentTurnIndex = (currentTurnIndex + 1) % turns.Count;
+      }
+    } else {
       currentTurnIndex = (currentTurnIndex + 1) % turns.Count;
     }
   }
