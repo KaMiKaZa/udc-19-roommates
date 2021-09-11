@@ -98,10 +98,55 @@ public class GridManager : MonoBehaviour {
     return OccupyKind.None;
   }
 
+  // TODO: return false if character can't push other one in the inputDirection
   public bool IsInputValid(Vector2 positionFrom, Vector2 inputDirection) {
     var occupyKind = GetCellStatus(positionFrom + inputDirection);
 
-    return occupyKind == OccupyKind.None;
+    return occupyKind == OccupyKind.None || occupyKind == OccupyKind.Character;
+  }
+
+  public Character GetCharacterAtCell(Vector2 position) {
+    return characterList
+      .Where(character => character.transform.position == (Vector3)position)
+      .FirstOrDefault();
+  }
+
+  private IEnumerator MoveCoroutine(Transform characterTransform, Vector2 direction, System.Action callback = null) {
+    float positionBlend = 0f;
+
+    Vector2 targetPosition = (Vector2)characterTransform.position + direction;
+
+    while (positionBlend < 1f) {
+      characterTransform.position = Vector2.Lerp(characterTransform.position, targetPosition, positionBlend);
+
+      positionBlend += Time.deltaTime;
+    
+      yield return null;
+    }
+
+    callback?.Invoke();
+  }
+
+  public void MoveCharacter(Character character, Vector2 direction, System.Action onMoveEndCallback) {
+    Vector2 targetPosition = (Vector2)character.transform.position + direction;
+
+    var occupyKind = GetCellStatus(targetPosition);
+
+    switch (occupyKind) {
+      case OccupyKind.None: {
+        StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback));
+
+        break;
+      }
+      case OccupyKind.Character: {
+        var characterToPush = GetCharacterAtCell(targetPosition);
+
+        StartCoroutine(MoveCoroutine(characterToPush.transform, direction));
+        StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback));
+
+        break;
+      }
+    }
   }
 
   public void CheckForDeadCharacters() {

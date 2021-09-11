@@ -3,12 +3,7 @@ using UnityEngine;
 public class CharacterTurn : Turn {
   private Character character;
 
-  private float positionBlend;
-
   public override bool CanExecute => character.IsAlive;
-
-  public Vector3 TargetPosition { get; set; }
-  public Vector2 MoveDirection { get; set; }
 
   private void Awake() {
     character = GetComponentInParent<Character>();
@@ -16,10 +11,6 @@ public class CharacterTurn : Turn {
 
   public override void Reset() {
     base.Reset();
-
-    MoveDirection = Vector2.zero;
-
-    positionBlend = 0f;
   }
 
   public override TurnPhase Execute(TurnManager manager) {
@@ -28,23 +19,13 @@ public class CharacterTurn : Turn {
         Vector2? move = character.GetMove();
 
         if (move.HasValue) {
-          TargetPosition = character.transform.position + (Vector3)move.Value;
+          if (move.Value == Vector2.zero) {
+            Phase = TurnPhase.End;
+          } else {
+            GridManager.Instance.MoveCharacter(character, move.Value, () => Phase = TurnPhase.End);
 
-          Phase = TurnPhase.Running;
-        }
-
-        break;
-      }
-      case TurnPhase.Running: {
-        if (positionBlend < 1f) {
-          character.transform.position = Vector3.Lerp(transform.position, TargetPosition, positionBlend);
-
-          positionBlend += Time.deltaTime;
-        } else {
-          // to avoid any kind of precision error
-          transform.position = TargetPosition;
-
-          Phase = TurnPhase.End;
+            Phase = TurnPhase.Running;
+          }
         }
 
         break;
