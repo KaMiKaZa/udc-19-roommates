@@ -54,7 +54,7 @@ public class GridManager : MonoBehaviour {
 
       do {
         spawnPosition = new Vector2(Mathf.Round(Random.Range(-3f, 3f)), Mathf.Round(Random.Range(-3f, 3f)));
-      } while (IsOccupied(spawnPosition) != OccupyKind.None);
+      } while (GetCellStatus(spawnPosition) != OccupyKind.None);
 
       characterList.Add(Instantiate(enemyPrefabs[index], spawnPosition, Quaternion.identity));
     }
@@ -79,7 +79,7 @@ public class GridManager : MonoBehaviour {
     return currentFurniture;
   }
 
-  public OccupyKind IsOccupied(Vector2 position) {
+  public OccupyKind GetCellStatus(Vector2 position) {
     Vector3 worldPosition = new Vector3(position.x, position.y, 0f);
 
     // TODO: check for walls and windows
@@ -99,7 +99,7 @@ public class GridManager : MonoBehaviour {
   }
 
   public bool IsInputValid(Vector2 positionFrom, Vector2 inputDirection) {
-    var occupyKind = IsOccupied(positionFrom + inputDirection);
+    var occupyKind = GetCellStatus(positionFrom + inputDirection);
 
     return occupyKind == OccupyKind.None;
   }
@@ -107,7 +107,7 @@ public class GridManager : MonoBehaviour {
   public void CheckForDeadCharacters() {
     // TODO: stop the game if player is dead
 
-    var deadCharacters = CharacterList.Where(character => IsOccupied(character.transform.position) == OccupyKind.Furniture);
+    var deadCharacters = CharacterList.Where(character => GetCellStatus(character.transform.position) == OccupyKind.Furniture);
 
     foreach (var character in deadCharacters) {
       character.IsAlive = false;
