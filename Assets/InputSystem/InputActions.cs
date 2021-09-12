@@ -33,6 +33,14 @@ public class @InputActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""GameEnd"",
+                    ""type"": ""Button"",
+                    ""id"": ""f9a5ab61-6c22-406d-86bd-ecddc1958730"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -101,6 +109,17 @@ public class @InputActions : IInputActionCollection, IDisposable
                     ""action"": ""TurnEnd"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e80e278a-354c-48ac-9d55-b23b22ecf222"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""GameEnd"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -111,6 +130,7 @@ public class @InputActions : IInputActionCollection, IDisposable
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_Move = m_Game.FindAction("Move", throwIfNotFound: true);
         m_Game_TurnEnd = m_Game.FindAction("TurnEnd", throwIfNotFound: true);
+        m_Game_GameEnd = m_Game.FindAction("GameEnd", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -162,12 +182,14 @@ public class @InputActions : IInputActionCollection, IDisposable
     private IGameActions m_GameActionsCallbackInterface;
     private readonly InputAction m_Game_Move;
     private readonly InputAction m_Game_TurnEnd;
+    private readonly InputAction m_Game_GameEnd;
     public struct GameActions
     {
         private @InputActions m_Wrapper;
         public GameActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Game_Move;
         public InputAction @TurnEnd => m_Wrapper.m_Game_TurnEnd;
+        public InputAction @GameEnd => m_Wrapper.m_Game_GameEnd;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -183,6 +205,9 @@ public class @InputActions : IInputActionCollection, IDisposable
                 @TurnEnd.started -= m_Wrapper.m_GameActionsCallbackInterface.OnTurnEnd;
                 @TurnEnd.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnTurnEnd;
                 @TurnEnd.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnTurnEnd;
+                @GameEnd.started -= m_Wrapper.m_GameActionsCallbackInterface.OnGameEnd;
+                @GameEnd.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnGameEnd;
+                @GameEnd.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnGameEnd;
             }
             m_Wrapper.m_GameActionsCallbackInterface = instance;
             if (instance != null)
@@ -193,6 +218,9 @@ public class @InputActions : IInputActionCollection, IDisposable
                 @TurnEnd.started += instance.OnTurnEnd;
                 @TurnEnd.performed += instance.OnTurnEnd;
                 @TurnEnd.canceled += instance.OnTurnEnd;
+                @GameEnd.started += instance.OnGameEnd;
+                @GameEnd.performed += instance.OnGameEnd;
+                @GameEnd.canceled += instance.OnGameEnd;
             }
         }
     }
@@ -201,5 +229,6 @@ public class @InputActions : IInputActionCollection, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnTurnEnd(InputAction.CallbackContext context);
+        void OnGameEnd(InputAction.CallbackContext context);
     }
 }

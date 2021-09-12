@@ -21,9 +21,12 @@ public class GridManager : MonoBehaviour {
   public PlayerCharacter playerPrefab;
   public EnemyCharacter[] enemyPrefabs;
 
+  public AudioSource WindowBreak;
+  public ParticleSystem WindowParticles;
+
   // grid
   private FurnitureGrid selectedGrid;
-  private Queue<GridEntry> furnitureQueue = new Queue<GridEntry>();
+  public Queue<GridEntry> FurnitureQueue = new Queue<GridEntry>();
   private List<GridEntry> spawnedFurnitureList = new List<GridEntry>();
 
   private GridEntry currentFurniture;
@@ -32,7 +35,6 @@ public class GridManager : MonoBehaviour {
   private Dictionary<Vector2, OccupyKind> gridOccupation = new Dictionary<Vector2, OccupyKind>();
 
   // characters
-  private PlayerCharacter player;
   private List<Character> characterList = new List<Character>();
   public List<Character> CharacterList => characterList;
 
@@ -46,41 +48,50 @@ public class GridManager : MonoBehaviour {
     foreach (var entry in selectedGrid.GetComponentsInChildren<GridEntry>()) {
       entry.gameObject.SetActive(false);
 
-      furnitureQueue.Enqueue(entry);
+      FurnitureQueue.Enqueue(entry);
     }
 
     foreach (var border in selectedGrid.GetComponentsInChildren<Border>()) {
       gridOccupation.Add(border.transform.position, (border is Wall) ? OccupyKind.Wall : OccupyKind.Window);
     }
 
-    for (int i = 0; i < selectedGrid.EnemyCount; i++) {
+    for (int i = 0; i < selectedGrid.EnemyCount + 1; i++) {
       int index = Random.Range(0, enemyPrefabs.Length);
 
       Vector2 spawnPosition;
 
       do {
-        spawnPosition = new Vector2(Mathf.Round(Random.Range(-3f, 3f)), Mathf.Round(Random.Range(-3f, 3f)));
-      } while (GetCellStatus(spawnPosition) != OccupyKind.None);
+        spawnPosition = new Vector2(Mathf.Round(Random.Range(-2f, 2f)), Mathf.Round(Random.Range(-2f, 2f)));
+      } while (characterList.Any(character => (Vector2)character.transform.position == spawnPosition));
 
-      characterList.Add(Instantiate(enemyPrefabs[index], spawnPosition, Quaternion.identity));
+      Character character;
+
+      if (i < selectedGrid.EnemyCount) {
+        character = Instantiate(enemyPrefabs[index], spawnPosition, Quaternion.identity);
+      } else {
+        // it's the last iteration in the case of i == selectedGrid.EnemyCount
+        character = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+      }
+
+      characterList.Add(character);
     }
 
-    player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-    characterList.Add(player);
   }
 
   public void ActivatePreview() {
-    if (furnitureQueue.Count > 0) {
-      currentFurniture = furnitureQueue.Dequeue();
+    if (FurnitureQueue.Count > 0) {
+      currentFurniture = FurnitureQueue.Dequeue();
 
       currentFurniture.ActivatePreview();
     }
   }
 
-  public GridEntry ActivateSpawn(System.Action onSpawnEndedCallback) {
+  public GridEntry ActivateSpawn(System.Action onSpawnActivatedCallback, System.Action onSpawnEndedCallback) {
     currentFurniture.ActivateSpawn(onSpawnEndedCallback);
 
     spawnedFurnitureList.Add(currentFurniture);
+
+    onSpawnActivatedCallback?.Invoke();
 
     return currentFurniture;
   }
@@ -123,7 +134,7 @@ public class GridManager : MonoBehaviour {
       .FirstOrDefault();
   }
 
-  private IEnumerator MoveCoroutine(Transform characterTransform, Vector2 direction, System.Action callback = null) {
+  private IEnumerator MoveCoroutine(Transform characterTransform, Vector2 direction, System.Action callback = null, float duration = 1f) {
     float positionBlend = 0f;
 
     Vector2 targetPosition = (Vector2)characterTransform.position + direction;
@@ -131,10 +142,12 @@ public class GridManager : MonoBehaviour {
     while (positionBlend < 1f) {
       characterTransform.position = Vector2.Lerp(characterTransform.position, targetPosition, positionBlend);
 
-      positionBlend += Time.deltaTime;
+      positionBlend += Time.deltaTime / duration;
     
       yield return null;
     }
+
+    characterTransform.position = targetPosition;
 
     callback?.Invoke();
   }
@@ -146,7 +159,11 @@ public class GridManager : MonoBehaviour {
 
     switch (occupyKind) {
       case OccupyKind.None: {
-        StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback));
+        if (character.MoveSound) {
+          character.MoveSound.Play();
+        }
+
+        StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback, 0.5f));
 
         break;
       }
@@ -156,12 +173,26 @@ public class GridManager : MonoBehaviour {
         MoveCharacter(characterToPush, direction, onMoveEndCallback);
         //StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback));
 
+        if (character.PushSound) {
+          character.PushSound.Play();
+        }
+
         break;
       }
       case OccupyKind.Window: {
-        onMoveEndCallback += () => character.OnWindowDeath();
+        WindowParticles.transform.position = targetPosition;
+        WindowParticles.gameObject.SetActive(true);
+        WindowParticles.Play();
 
-        StartCoroutine(MoveCoroutine(character.transform, direction * 2, onMoveEndCallback));
+        WindowBreak.Play();
+
+        onMoveEndCallback += () => {
+          character.OnWindowDeath();
+
+          CheckForDeadCharacters();
+        };
+
+        StartCoroutine(MoveCoroutine(character.transform, direction * 2, onMoveEndCallback, 0.5f));
 
         break;
       }
@@ -169,12 +200,20 @@ public class GridManager : MonoBehaviour {
   }
 
   public void CheckForDeadCharacters() {
-    // TODO: stop the game if player is dead
+    var deadByFurniture = CharacterList.Where(character => GetCellStatus(character.transform.position) == OccupyKind.Furniture);
 
-    var deadCharacters = CharacterList.Where(character => GetCellStatus(character.transform.position) == OccupyKind.Furniture);
+    foreach (var character in deadByFurniture) {
+      character.OnFurnitureDeath();
+    }
 
-    foreach (var character in deadCharacters) {
-      character.IsAlive = false;
+    characterList = characterList.Where(character => character.IsAlive).ToList();
+
+    UIManager.Instance.AliveCountText.text = "---";
+
+    if (characterList.Count == 1) {
+      // don't need to check if player is alive because player's death also calls EndTheGame()
+
+      TurnManager.Instance.EndTheGame();
     }
   }
 }

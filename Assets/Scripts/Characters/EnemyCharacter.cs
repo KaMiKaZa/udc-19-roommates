@@ -2,6 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyCharacter : Character {
+  public Sprite[] EnemySprites;
+
+  protected override void Awake() {
+    base.Awake();
+
+    GetComponentInChildren<SpriteRenderer>().sprite = EnemySprites[Random.Range(0, EnemySprites.Length)];
+  }
+
   public override Vector2? GetMove() {
     UIManager.Instance.TurnInfoText.text = "Enemy's turn";
 

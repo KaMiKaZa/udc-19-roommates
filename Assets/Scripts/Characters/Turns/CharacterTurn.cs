@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class CharacterTurn : Turn {
   private Character character;
+  public Character Character => character;
 
   public override bool CanExecute => character.IsAlive;
 
@@ -18,10 +19,14 @@ public class CharacterTurn : Turn {
       case TurnPhase.Start: {
         Vector2? move = character.GetMove();
 
+        UIManager.Instance.AliveCountText.text = $"Actions remaining: {TurnManager.Instance.GetRemainingTurnCount(character)}";
+
         if (move.HasValue) {
           if (move.Value == Vector2.zero) {
             Phase = TurnPhase.End;
           } else {
+            character.transform.rotation = Quaternion.LookRotation(Vector3.forward, move.Value);
+
             GridManager.Instance.MoveCharacter(character, move.Value, () => Phase = TurnPhase.End);
 
             Phase = TurnPhase.Running;

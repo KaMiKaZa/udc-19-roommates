@@ -16,6 +16,10 @@ public class PlayerActor : MonoBehaviour, InputActions.IGameActions {
     TurnEndInput(context.ReadValueAsButton());
   }
 
+  public void OnGameEnd(InputAction.CallbackContext context) {
+    Application.Quit();
+  }
+
   public void MoveInput(Vector2 newMoveDirection) {
     move = newMoveDirection;
   }

@@ -9,6 +9,12 @@ public class Character : MonoBehaviour {
   
   public bool IsMyTurn => Turns.Any(turn => turn.Phase != TurnPhase.Wait);
 
+  public AudioSource MoveSound;
+  public AudioSource PushSound;
+
+  public AudioSource FurnitureDeathSound;
+  public AudioSource WindowDeathSound;
+
   protected virtual void Awake() {
     IsAlive = true;
 
@@ -23,9 +29,21 @@ public class Character : MonoBehaviour {
     IsAlive = false;
   }
 
-  public virtual void OnWindowDeath() {
-    IsAlive = false;
+  public void OnFurnitureDeath() {
+    OnDeath();
 
-    Utils.RescaleOverTime(this, transform, transform.localScale, Vector3.one * 0.01f, () => gameObject.SetActive(false));
+    if (FurnitureDeathSound) {
+      FurnitureDeathSound.Play();
+    }
+  }
+
+  public void OnWindowDeath() {
+    OnDeath();
+
+    if (WindowDeathSound) {
+      WindowDeathSound.Play();
+    }
+
+    Utils.RescaleOverTime(this, transform, transform.localScale, Vector3.one * 0.01f, () => GetComponentInChildren<SpriteRenderer>().enabled = false);
   }
 }
