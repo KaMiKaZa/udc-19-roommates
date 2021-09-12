@@ -29,6 +29,8 @@ public class GridManager : MonoBehaviour {
   private GridEntry currentFurniture;
   public GridEntry CurrentFurniture => currentFurniture;
 
+  private Dictionary<Vector2, OccupyKind> gridOccupation = new Dictionary<Vector2, OccupyKind>();
+
   // characters
   private PlayerCharacter player;
   private List<Character> characterList = new List<Character>();
@@ -45,6 +47,10 @@ public class GridManager : MonoBehaviour {
       entry.gameObject.SetActive(false);
 
       furnitureQueue.Enqueue(entry);
+    }
+
+    foreach (var border in selectedGrid.GetComponentsInChildren<Border>()) {
+      gridOccupation.Add(border.transform.position, (border is Wall) ? OccupyKind.Wall : OccupyKind.Window);
     }
 
     for (int i = 0; i < selectedGrid.EnemyCount; i++) {
@@ -71,8 +77,8 @@ public class GridManager : MonoBehaviour {
     }
   }
 
-  public GridEntry ActivateSpawn() {
-    currentFurniture.ActivateSpawn();
+  public GridEntry ActivateSpawn(System.Action onSpawnEndedCallback) {
+    currentFurniture.ActivateSpawn(onSpawnEndedCallback);
 
     spawnedFurnitureList.Add(currentFurniture);
 
@@ -82,9 +88,8 @@ public class GridManager : MonoBehaviour {
   public OccupyKind GetCellStatus(Vector2 position) {
     Vector3 worldPosition = new Vector3(position.x, position.y, 0f);
 
-    // TODO: check for walls and windows
-    if (Mathf.Abs(position.x) > selectedGrid.GridWidth / 2 || Mathf.Abs(position.y) > selectedGrid.GridHeight / 2) {
-      return OccupyKind.Wall;
+    if (gridOccupation.ContainsKey(position)) {
+      return gridOccupation[position];
     }
 
     if (spawnedFurnitureList.Any(entry => entry.CompositeCollider.OverlapPoint(position))) {
@@ -98,11 +103,18 @@ public class GridManager : MonoBehaviour {
     return OccupyKind.None;
   }
 
-  // TODO: return false if character can't push other one in the inputDirection
   public bool IsInputValid(Vector2 positionFrom, Vector2 inputDirection) {
-    var occupyKind = GetCellStatus(positionFrom + inputDirection);
+    var targetOccupyKind = GetCellStatus(positionFrom + inputDirection);
 
-    return occupyKind == OccupyKind.None || occupyKind == OccupyKind.Character;
+    if (targetOccupyKind == OccupyKind.Character) {
+      var pushPosOccupyKind = GetCellStatus(positionFrom + inputDirection * 2);
+
+      // character can push another character only into an empty cell or a window
+      return pushPosOccupyKind == OccupyKind.None || pushPosOccupyKind == OccupyKind.Window;
+    }
+
+    // character can freely move into an empty cell or a window
+    return targetOccupyKind == OccupyKind.None || targetOccupyKind == OccupyKind.Window;
   }
 
   public Character GetCharacterAtCell(Vector2 position) {
@@ -141,8 +153,15 @@ public class GridManager : MonoBehaviour {
       case OccupyKind.Character: {
         var characterToPush = GetCharacterAtCell(targetPosition);
 
-        StartCoroutine(MoveCoroutine(characterToPush.transform, direction));
-        StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback));
+        MoveCharacter(characterToPush, direction, onMoveEndCallback);
+        //StartCoroutine(MoveCoroutine(character.transform, direction, onMoveEndCallback));
+
+        break;
+      }
+      case OccupyKind.Window: {
+        onMoveEndCallback += () => character.OnWindowDeath();
+
+        StartCoroutine(MoveCoroutine(character.transform, direction * 2, onMoveEndCallback));
 
         break;
       }
