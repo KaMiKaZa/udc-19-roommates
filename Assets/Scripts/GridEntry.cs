@@ -5,27 +5,33 @@ public class GridEntry : MonoBehaviour {
   private CompositeCollider2D compositeCollider;
   public CompositeCollider2D CompositeCollider => compositeCollider;
 
+  [SerializeField, Tooltip("Group of sprites representing the space occupied by this furniture")]
+  private GameObject previewGroup;
+
+  [SerializeField, Tooltip("Group of sprites representing this furniture")]
+  private GameObject furnitureGroup;
+
   private void Awake() {
     compositeCollider = GetComponent<CompositeCollider2D>();
   }
 
   public void ActivatePreview() {
     gameObject.SetActive(true);
+
+    previewGroup.SetActive(true);
+
+    furnitureGroup.SetActive(false);
   }
 
-  public void ActivateSpawn() {
-    // return alpha back to 1f
-    // it was 0.5f for a preview
-    var renderers = GetComponentsInChildren<SpriteRenderer>();
-
-    foreach (var renderer in renderers) {
-      var color = renderer.color;
-      color.a = 1f;
-      renderer.color = color;
+  public void ActivateSpawn(System.Action onSpawnEndedCallback) {
+    foreach (var sprite in previewGroup.GetComponentsInChildren<SpriteRenderer>()) {
+      sprite.enabled = false;
     }
 
-    // increase size to visualize spawn effect
-    // it will be reduced back to Vector3.one during the SpawnFurntitureTurn running phase
-    transform.localScale = Vector3.one * 7.5f;
+    furnitureGroup.SetActive(true);
+
+    var initialScale = furnitureGroup.transform.localScale;
+
+    Utils.RescaleOverTime(this, furnitureGroup.transform, initialScale * 8f, initialScale, onSpawnEndedCallback);
   }
 }
